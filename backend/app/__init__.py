@@ -10,6 +10,9 @@ def create_app():
     
     from app.routes.community import community_bp
     app.register_blueprint(community_bp)
+
     # with app.app_context():
-    #     from app import models
+    #     from app.models.user import User
+    #     from app.models.community import Community
+    #     from app.models.membership import CommunityMembership
     return app
