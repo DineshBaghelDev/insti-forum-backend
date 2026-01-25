@@ -15,4 +15,6 @@ def create_app():
     #     from app.models.user import User
     #     from app.models.community import Community
     #     from app.models.membership import CommunityMembership
+    # with app.app_context():
+    #     from app import models
     return app
