@@ -9,7 +9,13 @@ def create_app():
     db.init_app(app)
     
     from app.routes.community import community_bp
+    from app.routes.post import post_bp
+    from app.routes.comment import comment_bp
+
     app.register_blueprint(community_bp)
+    app.register_blueprint(post_bp)
+    app.register_blueprint(comment_bp)
+
 
     # with app.app_context():
     #     from app.models.user import User
