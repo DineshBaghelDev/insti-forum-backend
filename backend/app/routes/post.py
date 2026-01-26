@@ -53,7 +53,7 @@ def view_post(post_id):
         "created_at": post.created_at.isoformat(),
     }), 200
 
-@post_bp.route("/communities/<int:community_id>/posts", methods=["POST"])
+@post_bp.route("/communities/<int:community_id>/posts", methods=["GET"])
 def view_community_posts(community_id):
     posts = Post.query.filter_by(community_id=community_id).all()
     post_list = []
@@ -69,3 +69,4 @@ def view_community_posts(community_id):
     if not post_list:
         return {"error": "Oops! No posts found in this community."}, 404
     return post_list, 200
+
