@@ -3,10 +3,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from app.models.user import User
 from app.extensions import db, bcrypt
 from app.models.user import User
-
-auth_bp = Blueprint(__name__)
-
-users = {"testuser": bcrypt.generate_password_hash("testpass").decode('utf-8')}
+auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/auth/login', methods=['POST'])
 def login():
@@ -15,14 +12,15 @@ def login():
     data = request.get_json()
     identifier = data.get('identifier')
     password = data.get('password')
+    found_user = None
     found_user_by_email = User.query.filter_by(email = identifier).first()
-    found_user_by_name = User.query.filter_by(email = identifier).first()
+    found_user_by_username = User.query.filter_by(username = identifier).first()
     if found_user_by_email:
         found_user = found_user_by_email
-    elif found_user_by_name:
+    elif found_user_by_username:
         found_user = found_user_by_name
 
-    if found_user and bcrypt.check_password_hash(found_user.password, password):
+    if found_user and bcrypt.check_password_hash(found_user.password_hash, password):
         access_token = create_access_token(identity=str(found_user.id))
         return jsonify(access_token=access_token), 200
     else:
@@ -31,17 +29,17 @@ def login():
 @auth_bp.route('/auth/signup', methods=['POST'])
 def signup():
     data = request.get_json()
-    name = data.get('name')
+    username = data.get('username')
     email = data.get('email')
     password = data.get('password')
     
     found_user_email = User.query.filter_by(email=email).first() 
-    found_user_name = User.query.filter_by(name=name).first()
+    found_user_name = User.query.filter_by(username=username).first()
     if found_user_email or found_user_name:
         return jsonify({"msg": "User already exists"}), 409
     else:
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-        new_user = User(name=name, email=email, password=hashed_password)
+        new_user = User(username=username, email=email, password_hash=hashed_password)
         db.session.add(new_user)
         db.session.commit()
         return jsonify({"msg": "User created successfully"}), 201
@@ -55,7 +53,8 @@ def view_profile():
         return jsonify({"msg": "User not found"}), 404
     return jsonify({
         "id": user.id,
-        "name": user.name,
+        "name": user.username,
         "email": user.email,
         "created_at": user.created_at.isoformat(),
     }), 200
+
