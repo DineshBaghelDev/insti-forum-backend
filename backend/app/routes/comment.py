@@ -46,7 +46,16 @@ def view_comments(post_id):
             "created_at": i.created_at.isoformat(),
         })
     return comments_list, 200
-@comment_bp.route("posts/<int:post_id>/comments", methods = ["GET"])
+        
+@comment_bp.route("comments/<int:comment_id>/delete", methods = ["DELETE"])
 def delete_comments(comment_id)
-  user_id = get_jwt_identity()
-  post_id = PO
+    user_id = get_jwt_identity()
+    comment = Comments.query.get(comment_id)
+    if not comment:
+        return {"Error" : "Oops! Comment not found!"}, 404
+    if comment.user_id != user_id:
+        return {"Error" : "You are not authorized to delete this comment."}, 403
+    db.session.delete(comment)
+    db.session.commit()
+    return {"message" : "Success! Post deleted succesfully."}, 200
+
