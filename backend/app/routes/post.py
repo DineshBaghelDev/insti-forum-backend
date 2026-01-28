@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from app.extensions import db
 from app.models.user import User
 from app.models.community import Community
@@ -7,11 +8,11 @@ from app.models.post import Post
 
 post_bp = Blueprint("post", __name__)
 
-@post_bp.route("/posts", methods=["POST"])
-def create_post():
+@post_bp.route("/communities/<int:community_id>/posts", methods=["POST"])
+@jwt_required()
+def create_post(community_id):
     data = request.get_json()
-    user_id = 1 #to be changed
-    community_id = data.get("community_id")
+    user_id = get_jwt_identity()
     is_member = CommunityMembership.query.filter_by(
         user_id=user_id, 
         community_id=community_id
@@ -21,8 +22,8 @@ def create_post():
         description = data.get("description")
         title = data.get("title")
         content = data.get("content")
-        if not community_id:
-            return {"error": "Community ID is required"}, 400
+        if not title:
+            return {"error": "Post title is required"}, 400
      
         new_post = Post(
             user_id=user_id,
@@ -32,18 +33,18 @@ def create_post():
             ) 
         db.session.add(new_post)
         db.session.commit()
-        return {
-            "message": "Success! Post created successfully.",
+        return jsonify({
+            "msg": "Success! Post created successfully.",
             "post_id": new_post.id
-        }, 201
+        }), 201
     else:
-        return {"error": "You must be a member of the community to create a post."}, 403
+        return jsonify({"error": "You must be a member of the community to create a post."}), 403
 
 @post_bp.route("/posts/<int:post_id>", methods=["GET"])
 def view_post(post_id):
     post = Post.query.get(post_id)
     if not post:
-        return {"error": "Oops! Post not found"}, 404
+        return jsonify({"error": "Oops! Post not found"}), 404
     return jsonify({
         "id": post.id,
         "user_id": post.user_id,
@@ -67,6 +68,6 @@ def view_community_posts(community_id):
             "created_at": i.created_at.isoformat(),
         })
     if not post_list:
-        return {"error": "Oops! No posts found in this community."}, 404
-    return post_list, 200
+        return jsonify({"error": "Oops! No posts found in this community."}), 404
+    return jsonify(post_list), 200
 

@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from app.models.user import User
 from app.extensions import db, bcrypt
-from app.models.user import User
+
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/auth/login', methods=['POST'])
@@ -12,13 +12,19 @@ def login():
     data = request.get_json()
     identifier = data.get('identifier')
     password = data.get('password')
+
+    if not identifier:
+        return jsonify({"msg": "Username or email is required"}), 400
+    if not password:
+        return jsonify({"msg": "Password is required"}), 400
+    
     found_user = None
     found_user_by_email = User.query.filter_by(email = identifier).first()
     found_user_by_username = User.query.filter_by(username = identifier).first()
     if found_user_by_email:
         found_user = found_user_by_email
     elif found_user_by_username:
-        found_user = found_user_by_name
+        found_user = found_user_by_username
 
     if found_user and bcrypt.check_password_hash(found_user.password_hash, password):
         access_token = create_access_token(identity=str(found_user.id))
@@ -33,6 +39,13 @@ def signup():
     email = data.get('email')
     password = data.get('password')
     
+    if not username:
+        return jsonify({"msg": "Username is required"}), 400
+    if not email:
+        return jsonify({"msg": "Email is required"}), 400   
+    if not password:
+        return jsonify({"msg": "Password is required"}), 400
+
     found_user_email = User.query.filter_by(email=email).first() 
     found_user_name = User.query.filter_by(username=username).first()
     if found_user_email or found_user_name:
