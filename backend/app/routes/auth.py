@@ -3,6 +3,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from app.models.user import User
 from app.extensions import db, bcrypt
 from app.models.user import User
+from app.utils.validators import check_user_input
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/auth/login', methods=['POST'])
@@ -57,4 +58,5 @@ def view_profile():
         "email": user.email,
         "created_at": user.created_at.isoformat(),
     }), 200
+
 
