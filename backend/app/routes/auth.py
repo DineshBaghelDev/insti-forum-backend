@@ -33,6 +33,7 @@ def signup():
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
+    is_valid, error_msg = check_user_input(email)
     
     found_user_email = User.query.filter_by(email=email).first() 
     found_user_name = User.query.filter_by(username=username).first()
@@ -58,5 +59,6 @@ def view_profile():
         "email": user.email,
         "created_at": user.created_at.isoformat(),
     }), 200
+
 
 
