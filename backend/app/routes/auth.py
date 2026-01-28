@@ -1,7 +1,9 @@
+import email
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from app.models.user import User
 from app.extensions import db, bcrypt
+from app.utils.validators import check_user_input
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -46,6 +48,11 @@ def signup():
     if not password:
         return jsonify({"msg": "Password is required"}), 400
 
+    is_valid, error_msg = check_user_input(email)
+
+    if not is_valid:
+        return jsonify({"msg": f"Invalid email address: {error_msg}"}), 400
+
     found_user_email = User.query.filter_by(email=email).first() 
     found_user_name = User.query.filter_by(username=username).first()
     if found_user_email or found_user_name:
@@ -70,4 +77,6 @@ def view_profile():
         "email": user.email,
         "created_at": user.created_at.isoformat(),
     }), 200
+
+
 

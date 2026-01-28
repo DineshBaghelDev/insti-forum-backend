@@ -78,7 +78,7 @@ def join_community(community_id):
         "membership_id": membership.id,
     }), 201
 
-@community_bp.route("/communities/<int:community_id>/leave", methods=["POST"])
+@community_bp.route("/communities/<int:community_id>/leave", methods=["DELETE"])
 @jwt_required()
 def leave_community(community_id):
     community = Community.query.get(community_id)
@@ -93,4 +93,20 @@ def leave_community(community_id):
     
     db.session.delete(membership)
     db.session.commit()
-    return jsonify({"msg": f"Left {community.name} successfully!"}), 204
+    return jsonify({"msg": f"Left {community.name} successfully!"}), 200
+
+@community_bp.route("/communities/<int:community_id>/delete", methods = ["DELETE"])
+@jwt_required()
+def delete_community(community_id):
+    user_id = get_jwt_identity()
+    community = Community.query.get(community_id)
+    if not community:
+        return jsonify({"error" : "Oops! Community not found."}), 404
+    if str(community.creator_id) != user_id:
+        return jsonify({"error" : "You are not authorized to delete this community."}), 403
+    db.session.delete(community)
+    db.session.commit()
+    return jsonify({"msg": f"Community deleted successfully"}), 200
+    
+            
+
