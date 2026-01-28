@@ -1,9 +1,6 @@
 # insti-forum-backend
 Backend for our Insti Forum
 
-<<<<<<< HEAD
-
-=======
 ## Dependencies - You need to install these via pip:
 
 a. flask  
@@ -73,23 +70,28 @@ Expect: 200 with a list of all communities containing the following info of each
   - creator_id
   - created_at
 
-**c. View a single community (GET /communities/<int:community_id>)**  
+**c. View a single community (GET /communities/`<int:community_id>`)**  
 
 Expect: 200 with all details of the community (same as before).
 
-**d. Join a community (POST /communities/<int:community_id>/join)**  
+**d. Join a community (POST /communities/`<int:community_id>`/join)**  
 
 Required: JWT Token in Header.  
 Expect: 201 with membership_id.
 
-**d. Leave a community (POST /communities/<int:community_id>/join)**  
+**d. Leave a community (POST /communities/`<int:community_id>`/join)**  
 
 Required: JWT Token in Header.  
 Expect: 204
 
+**e. Delete a community (DELETE /communities/`<int:community_id>`/delete)**  
+
+Required: Only creator can delete a community.  
+Expect: 200
+
 ## 3. Post Routes (routes/post.py) - Base Path: /
 
-**a. Create Post (POST communitites/<int:community_id>/posts)**  
+**a. Create Post (POST communitites/`<int:community_id>`/posts)**  
 
 Required: JWT Token in Header.   
 Send: 
@@ -99,7 +101,7 @@ Send:
 Note: Backend checks if you are a member of that community first.  
 Expect: 201 with post_id.
 
-**b. Get Single Post (GET /posts/<int:post_id>)**  
+**b. Get Single Post (GET /posts/`<int:post_id>`)**  
 
 Expect: 200 with 
   - id
@@ -111,13 +113,18 @@ Expect: 200 with
       
     in JSON or 404 if it doesn't exist.
 
-**c. Get Community Feed (GET /communities/<int:community_id>/posts)**    
+**c. Get Community Feed (GET /communities/`<int:community_id>`/posts)**    
 
 Expect: 200 with an array of post objects (same as before) or 404 if the community is empty.
 
+**d. Delete a post (DELETE /posts/`<int:post_id>`/delete)**  
+
+Required: Only post creator can delete it.  
+Expect: 200
+
 ## 4. Comment Routes (routes/comment.py)
 
-**a. Create comment (POST /posts/<int:post_id>/comments)**  
+**a. Create comment (POST /posts/`<int:post_id>`/comments)**  
 
 Required: JWT Token in Header.  
 Send: 
@@ -125,7 +132,7 @@ Send:
      
 Expect: 201 with comment_id.
 
-**b. View comments (POST /posts/<int:post_id>/comments)**  
+**b. View comments (POST /posts/`<int:post_id>`/comments)**  
 
 Expect: 200 with list of all comments and their details
   - id
@@ -133,6 +140,11 @@ Expect: 200 with list of all comments and their details
   - content
   - author_id
   - created_at
+
+**c. Delete a comment (DELETE /comments/`<int:comment_id>`/delete)**  
+
+Required: Only comment author can delete a comment.  
+Expect: 200
 
 ## Critical Implementation Notes
 
@@ -149,4 +161,3 @@ e. Member Check: For POST /posts, if the user is not a member of the community, 
 f. Data Types: community_id and post_id must be sent as Integers, not Strings.
 
 g. All requests and responses are in JSON format
->>>>>>> origin/User-and-post
