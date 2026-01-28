@@ -93,4 +93,4 @@ def leave_community(community_id):
     
     db.session.delete(membership)
     db.session.commit()
-    return jsonify({"msg": f"Left {community.name} successfully!"}), 200
+    return jsonify({"msg": f"Left {community.name} successfully!"}), 204
