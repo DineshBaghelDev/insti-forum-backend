@@ -1,7 +1,7 @@
 # insti-forum-backend
 Backend for our Insti Forum
 
-1. Dependencies - You need to install these via pip:
+# 1. Dependencies - You need to install these via pip:
 
 a. flask
 b. flask-sqlalchemy
@@ -10,16 +10,34 @@ d. flask-jwt-extended
 (email-validator
 password-validator)
 
-2. Auth Routes (routes/auth.py) - Base Path: /auth
+# 2. Auth Routes (routes/auth.py) - Base Path: /auth
+
 a. Signup (POST /auth/signup) - Send: username, email, password (JSON) - Expect: 201 (Success) or 400/ 409 (Error).
 
 b. Login (POST /auth/login) - Send: identifier (can be email or username), password - Expect: 200 with an access_token or 401 (Fail).
 
 c. View Profile (GET /auth/me) - Required: JWT Token in Header. - Expect: 200 with user id, username, email, and created_at.
 
-3. Post Routes (routes/post.py) - Base Path: /
+# 3. Community Routes (routes/community.py)
 
-a. Create Post (POST /posts) - Required: JWT Token in Header. - Send: community_id, title, content.
+a. Create Community (POST /communities)
+Expect: 201 with community_id.
+
+b. View all communities (GET /communities)
+Expect: 200 with a list of all communities and all their details.
+
+c. View a single community (GET /communities/<int:community_id>)
+Expect: 200 with all details of the community.
+
+d. Join a community (POST /communities/<int:community_id>/join)
+Expect: 201 with membership_id.
+
+d. Leave a community (POST /communities/<int:community_id>/join)
+Expect: Only message.
+
+# 4. Post Routes (routes/post.py) - Base Path: /
+
+a. Create Post (POST communitites/<int:community_id>/posts) - Required: JWT Token in Header. - Send: community_id, title, content.
 Note: Backend checks if you are a member of that community first.
 Expect: 201 with post_id.
 
@@ -29,7 +47,15 @@ Expect: 200 with full post details or 404 if it doesn't exist.
 c. Get Community Feed (GET /communities/<int:community_id>/posts)
 Expect: 200 with an array of post objects or 404 if the community is empty.
 
-4. Critical Implementation Notes
+# 5. Comment Routes (routes/comment.py)
+
+a. Create comment (POST /posts/<int:post_id>/comments)
+Expect: 201 with comment_id.
+
+b. View comments (POST /posts/<int:post_id>/comments)
+Expect: 200 with list of all comments and their details.
+
+# 6. Critical Implementation Notes
 
 a. JWT Header: For all protected routes (/auth/me and /posts), the frontend must send the token like this: Authorization: Bearer <your_token>.
 
