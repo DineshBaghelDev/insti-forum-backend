@@ -1,4 +1,4 @@
-#Only for test runswith sample data
+#Only for test runs with sample data
 
 from app import create_app
 from app.extensions import db
